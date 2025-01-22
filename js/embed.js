@@ -116,47 +116,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const selectElement = document.querySelector('[fs-combobox-element="select"].combobox_select.w-select');
   const selectedWrapper = document.querySelector('.form_combobox-select-wrapper');
+  const pillTemplate = document.querySelector('.form_combobox-selected-state-wrapper');
 
-  if (selectElement && selectedWrapper) {
-    console.log('Combobox and selected wrapper elements found');
+  if (selectElement && selectedWrapper && pillTemplate) {
+    console.log('Combobox, selected wrapper, and pill template found');
 
     selectElement.addEventListener('change', (event) => {
       const selectedOptions = Array.from(selectElement.selectedOptions);
-      selectedWrapper.innerHTML = ''; // Clear existing selections
+      selectedWrapper.innerHTML = ''; // Clear existing pills
 
       selectedOptions.forEach(option => {
-        const stateWrapper = document.createElement('a');
-        stateWrapper.classList.add('form_combobox-selected-state-wrapper', 'w-inline-block');
-        stateWrapper.href = '#';
+        // Clone the pill template
+        const pillClone = pillTemplate.cloneNode(true);
+        pillClone.style.display = 'block'; // Ensure the pill is visible
+        pillClone.querySelector('.form_combobox-selected-state-text').textContent = option.value; // Update the text
 
-        const stateText = document.createElement('div');
-        stateText.classList.add('form_combobox-selected-state-text');
-        stateText.textContent = option.value; // Use the option's value
+        // Set a data attribute to identify the pill
+        pillClone.setAttribute('data-value', option.value);
 
-        const removeIcon = document.createElement('div');
-        removeIcon.classList.add('combobox_reset', 'w-embed');
-        removeIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" role="img" width="100%" height="100%" preserveAspectRatio="xMidYMid meet" viewBox="0 0 24 24">
-                                  <path fill="currentColor" d="M19 6.41L17.59 5L12 10.59L6.41 5L5 6.41L10.59 12L5 17.59L6.41 19L12 13.41L17.59 19L19 17.59L13.41 12L19 6.41z"></path>
-                                </svg>`;
-
-        // Append text and remove icon to the state wrapper
-        stateWrapper.appendChild(stateText);
-        stateWrapper.appendChild(removeIcon);
-
-        // Append the state wrapper to the selected wrapper
-        selectedWrapper.appendChild(stateWrapper);
+        // Append the cloned pill to the wrapper
+        selectedWrapper.appendChild(pillClone);
 
         // Add event listener to remove the selected state
-        removeIcon.addEventListener('click', (e) => {
+        pillClone.addEventListener('click', (e) => {
           e.preventDefault();
           option.selected = false; // Deselect the option
-          stateWrapper.remove(); // Remove the element from the DOM
+          pillClone.remove(); // Remove the pill from the DOM
         });
       });
 
       console.log('Selected options updated');
     });
   } else {
-    console.error('Combobox or selected wrapper element not found');
+    console.error('Combobox, selected wrapper, or pill template not found');
   }
 });
