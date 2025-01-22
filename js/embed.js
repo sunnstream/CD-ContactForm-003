@@ -13,14 +13,15 @@ window.Webflow.push(() => {
   // Function to go to the next slide
   function goToNextStep() {
     console.log('Attempting to go to next step:', formState.currentStep);
-    if (validationRules[formState.currentStep]()) {
-      console.log('Validation passed for step:', formState.currentStep);
-      formState.currentStep++;
-      console.log('Advanced to step:', formState.currentStep);
-      // Trigger the next slide using Webflow's slider API
-      $(slider).find('.w-slider-arrow-right').click();
+    formState.currentStep++;
+    console.log('Advanced to step:', formState.currentStep);
+    // Trigger the next slide using Webflow's slider API
+    const rightArrow = $(slider).find('.w-slider-arrow-right');
+    if (rightArrow.length) {
+      rightArrow[0].click(); // Ensure the click event is triggered on the first arrow element
+      console.log('Slider advanced to next slide');
     } else {
-      console.log('Validation failed for step:', formState.currentStep);
+      console.error('Slider right arrow not found');
     }
   }
   // Function to go to the previous slide
@@ -29,7 +30,13 @@ window.Webflow.push(() => {
       formState.currentStep--;
       console.log('Returned to step:', formState.currentStep);
       // Trigger the previous slide using Webflow's slider API
-      $(slider).find('.w-slider-arrow-left').click();
+      const leftArrow = $(slider).find('.w-slider-arrow-left');
+      if (leftArrow.length) {
+        leftArrow[0].click(); // Ensure the click event is triggered on the first arrow element
+        console.log('Slider moved to previous slide');
+      } else {
+        console.error('Slider left arrow not found');
+      }
     } else {
       console.log('Already at the first step, cannot go back further.');
     }
@@ -46,30 +53,18 @@ window.Webflow.push(() => {
   prevButtons.forEach(button => {
     button.addEventListener('click', (e) => {
       e.preventDefault();
-      console.log('Previous button clicked');
+      console.log('Previous button clicked at step:', formState.currentStep);
       goToPreviousStep();
     });
   });
   // Initialize slide visibility
   console.log('Slider initialized, current step:', formState.currentStep);
   const validationRules = {
-    0: () => true, // Temporarily allow step 0 to always pass validation
-    1: () => {
-      const isValid = validateStep1();
-      console.log('Validation result for step 1:', isValid);
-      return isValid;
-    },
-    2: () => {
-      const isValid = validateStep2();
-      console.log('Validation result for step 2:', isValid);
-      return isValid;
-    },
-    3: () => {
-      const isValid = validateStep3();
-      console.log('Validation result for step 3:', isValid);
-      return isValid;
-    },
-    4: () => true // Confirmation step
+    0: () => true, // Allow step 0 to always pass validation
+    1: () => true, // Allow step 1 to always pass validation
+    2: () => true, // Allow step 2 to always pass validation
+    3: () => true, // Allow step 3 to always pass validation
+    4: () => true  // Allow step 4 to always pass validation
   };
   function validateStep1() {
     const firstName = document.getElementById('First-name').value;
@@ -91,16 +86,23 @@ window.Webflow.push(() => {
     return firstName && lastName && isValidEmail(email) && isValidPhone(phone) && products.length > 0;
   }
   function validateStep2() {
-    // Add your validation logic for step 2 here
-    // For example, check if a certain field is filled
-    const someField = document.getElementById('some-field-id').value;
-    const isValid = someField !== '';
-    console.log('Step 2 validation:', isValid, 'Field value:', someField);
+    // Validate radio buttons
+    const selectedRadio = document.querySelector('input[name="radio-group"]:checked');
+    const isRadioValid = selectedRadio !== null;
+    console.log('Step 2 - Radio button selected:', isRadioValid);
+
+    // Validate combobox select
+    const comboboxSelect = document.querySelector('[fs-combobox-element="select"].combobox_select.w-select');
+    const isComboboxValid = comboboxSelect.checkValidity();
+    console.log('Step 2 - Combobox selection valid:', isComboboxValid);
+
+    // Overall validation for step 2
+    const isValid = isRadioValid && isComboboxValid;
+    console.log('Step 2 validation result:', isValid);
     return isValid;
   }
   function validateStep3() {
     // Add your validation logic for step 3 here
-    // For example, check if a certain field is filled
     const anotherField = document.getElementById('another-field-id').value;
     const isValid = anotherField !== '';
     console.log('Step 3 validation:', isValid, 'Field value:', anotherField);
