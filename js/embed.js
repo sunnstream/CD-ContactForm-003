@@ -122,26 +122,35 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log('Combobox, selected wrapper, and pill template found');
 
     selectElement.addEventListener('change', (event) => {
+      console.log('Combobox selection changed');
       const selectedOptions = Array.from(selectElement.selectedOptions);
+      console.log('Selected options:', selectedOptions.map(option => option.value));
+      
       selectedWrapper.innerHTML = ''; // Clear existing pills
+      console.log('Cleared existing pills');
 
       selectedOptions.forEach(option => {
+        console.log('Processing option:', option.value);
+        
         // Clone the pill template
         const pillClone = pillTemplate.cloneNode(true);
         pillClone.style.display = 'block'; // Ensure the pill is visible
         pillClone.querySelector('.form_combobox-selected-state-text').textContent = option.value; // Update the text
+        console.log('Created pill for option:', option.value);
 
         // Set a data attribute to identify the pill
         pillClone.setAttribute('data-value', option.value);
 
         // Append the cloned pill to the wrapper
         selectedWrapper.appendChild(pillClone);
+        console.log('Appended pill to wrapper for option:', option.value);
 
         // Add event listener to remove the selected state
         pillClone.addEventListener('click', (e) => {
           e.preventDefault();
           option.selected = false; // Deselect the option
           pillClone.remove(); // Remove the pill from the DOM
+          console.log('Removed pill for option:', option.value);
         });
       });
 
